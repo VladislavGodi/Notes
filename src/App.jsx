@@ -1,17 +1,33 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './App.css';
+import axios from 'axios';
 
 function App() {
     const [notes, setNotes] = useState([]);
     const [noteText, setNoteText] = useState('');
     const [editIndex, setEditIndex] = useState(null);
 
-    // const addNote = () => {
-    //     if (noteText.trim() !== '') {
-    //         setNotes([...notes, noteText]);
-    //         setNoteText('');
-    //     }
-    // };
+    useEffect(() => {
+        const getText = async () => {
+            const response = await axios.get('https://66d6f6b9006bfbe2e64f47b2.mockapi.io/notes');
+            const texts = response.data.map((note) => note.text);
+            setNotes(texts);
+        };
+        getText();
+    }, []);
+
+    // (() => {
+    //     const sendText = async () => {
+    //         const data = Object.entries(notes).map(([index, text]) => ({
+    //             id: index,
+    //             text: text,
+    //         }));
+
+    //         const response = await axios.post('https://66d6f6b9006bfbe2e64f47b2.mockapi.io/notes', data);
+    //         console.log(response.data);
+    //     };
+    //     sendText();
+    // }, []);
 
     const deleteNote = (index) => {
         setNotes(notes.filter((_, i) => i !== index));
@@ -27,6 +43,16 @@ function App() {
                 setEditIndex(null);
             } else {
                 setNotes([...notes, noteText]);
+                const data = Object.entries(notes).map(([index, text]) => ({
+                    id: index,
+                    text: noteText,
+                }));
+
+                const response = axios.post(
+                    'https://66d6f6b9006bfbe2e64f47b2.mockapi.io/notes',
+                    notes,
+                );
+                console.log(response);
             }
             setNoteText('');
         }
